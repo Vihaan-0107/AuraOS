@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA OS — Classic Monochrome Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Radar & Telemetry Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Classic Black & White Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #000000;
+            cursor: pointer;
+            margin-top: -5px;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+            transition: transform 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.18);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 5px;
+            cursor: pointer;
+            background: #262626;
+            border-radius: 999px;
+        }
+        /* Smooth circular gauge transition */
+        .gauge-circle {
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease;
+        }
+        /* Subtle custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 999px;
+        }
+        /* Nike-Style Kinetic Intro Animations */
+        @keyframes nikeSlam {
+            0% {
+                opacity: 0;
+                transform: translateY(115%) skewY(3deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) skewY(0deg);
+            }
+        }
+        @keyframes lineExpand {
+            0% {
+                transform: scaleX(0);
+            }
+            100% {
+                transform: scaleX(1);
+            }
+        }
+        .nike-reveal-1 {
+            opacity: 0;
+            animation: nikeSlam 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+        }
+        .nike-reveal-2 {
+            opacity: 0;
+            animation: nikeSlam 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+        }
+        .nike-reveal-3 {
+            opacity: 0;
+            animation: nikeSlam 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+        }
+        .nike-fade-up {
+            opacity: 0;
+            animation: nikeSlam 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+        }
+        .nike-divider {
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: lineExpand 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
+        }
+        /* Converging Words Intro Animation */
+        @keyframes convergeLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-75px) scale(1.08);
+                letter-spacing: 0.16em;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                letter-spacing: -0.04em;
+            }
+        }
+        @keyframes convergeRight {
+            0% {
+                opacity: 0;
+                transform: translateX(75px) scale(1.08);
+                letter-spacing: 0.16em;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                letter-spacing: -0.04em;
+            }
+        }
+        @keyframes convergeCenter {
+            0% {
+                opacity: 0;
+                transform: translateY(36px) scale(1.22);
+                letter-spacing: 0.22em;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                letter-spacing: -0.04em;
+            }
+        }
+        @keyframes wordByWordPop {
+            0% {
+                opacity: 0;
+                transform: translateY(22px) scale(0.96);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .word-seq {
+            display: inline-block;
+            opacity: 0;
+            animation: wordByWordPop 0.42s cubic-bezier(0.16, 1, 0.3, 1) var(--word-delay, 0s) forwards;
+        }
+        .word-converge-left {
+            display: inline-block;
+            opacity: 0;
+            animation: convergeLeft 0.72s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+        }
+        .word-converge-right {
+            display: inline-block;
+            opacity: 0;
+            animation: convergeRight 0.72s cubic-bezier(0.16, 1, 0.3, 1) 0.28s forwards;
+        }
+        .word-converge-center {
+            display: inline-block;
+            opacity: 0;
+            animation: convergeCenter 0.78s cubic-bezier(0.16, 1, 0.3, 1) 0.44s forwards;
+        }
+    </style>
+</head>
+<body class="bg-black text-neutral-100 font-sans antialiased min-h-screen flex flex-col selection:bg-white selection:text-black relative overflow-x-hidden">
+
+    <!-- NIKE-STYLE CINEMATIC KINETIC INTRO OVERLAY WITH WORD-BY-WORD REVEAL -->
+    <div id="nikeIntroOverlay" class="fixed inset-0 z-50 bg-black flex flex-col justify-between p-6 sm:p-12 transition-all duration-700 ease-in-out">
+        <!-- Top Bar inside Intro -->
+        <div class="flex items-center justify-between border-b border-neutral-800 pb-4">
+            <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 bg-white inline-block"></span>
+                <span class="font-mono text-xs uppercase tracking-[0.25em] text-neutral-300">AURA OS // WEBSITE INTRO</span>
+            </div>
+            <button onclick="dismissIntro()" class="font-mono text-xs uppercase tracking-widest text-neutral-400 hover:text-white transition">
+                Skip Intro [ESC] →
+            </button>
+        </div>
+
+        <!-- Center Word-by-Word Website Intro -->
+        <div class="max-w-5xl my-auto py-8">
+            <p class="font-mono text-xs sm:text-sm uppercase tracking-[0.25em] text-neutral-400 mb-4 flex flex-wrap gap-x-2">
+                <span class="word-seq" style="--word-delay: 0.08s;">WELCOME</span>
+                <span class="word-seq" style="--word-delay: 0.16s;">TO</span>
+                <span class="word-seq text-white" style="--word-delay: 0.24s;">AURA</span>
+                <span class="word-seq text-white" style="--word-delay: 0.32s;">OS</span>
+                <span class="word-seq" style="--word-delay: 0.40s;">—</span>
+                <span class="word-seq" style="--word-delay: 0.48s;">YOUR</span>
+                <span class="word-seq" style="--word-delay: 0.56s;">LIFE</span>
+                <span class="word-seq" style="--word-delay: 0.64s;">&amp;</span>
+                <span class="word-seq" style="--word-delay: 0.72s;">FOCUS</span>
+                <span class="word-seq" style="--word-delay: 0.80s;">MONITOR</span>
+            </p>
+            <div class="overflow-hidden">
+                <h1 class="text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter leading-[0.94] text-white flex flex-wrap gap-x-4 sm:gap-x-6">
+                    <span class="word-seq" style="--word-delay: 0.92s;">WATCH</span>
+                    <span class="word-seq" style="--word-delay: 1.08s;">EVERY</span>
+                    <span class="word-seq" style="--word-delay: 1.24s;">HABIT.</span>
+                </h1>
+            </div>
+            <div class="overflow-hidden mt-1 sm:mt-2">
+                <h1 class="text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter leading-[0.94] text-neutral-400 flex flex-wrap gap-x-4 sm:gap-x-6">
+                    <span class="word-seq" style="--word-delay: 1.40s;">FIX</span>
+                    <span class="word-seq" style="--word-delay: 1.56s;">EVERY</span>
+                    <span class="word-seq text-white" style="--word-delay: 1.72s;">LEAK.</span>
+                </h1>
+            </div>
+            <div class="overflow-hidden mt-1 sm:mt-2">
+                <h1 class="text-5xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter leading-[0.94] text-white italic flex flex-wrap gap-x-4 sm:gap-x-6">
+                    <span class="word-seq" style="--word-delay: 1.88s;">STAY</span>
+                    <span class="word-seq" style="--word-delay: 2.04s;">FOCUSED.</span>
+                </h1>
+            </div>
+
+            <div class="nike-divider h-[2px] w-full bg-white my-6 sm:my-8"></div>
+
+            <div class="nike-fade-up flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <p class="text-sm sm:text-base text-neutral-300 max-w-xl font-medium leading-relaxed">
+                    AURA OS monitors what you do across deep work, screen time, sleep, and habits—then gives clear advice and upgrades so you can stay locked in.
+                </p>
+                <button onclick="dismissIntro()" class="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-black font-black uppercase tracking-wider text-sm rounded-full hover:bg-neutral-200 transition active:scale-95 shrink-0 shadow-[0_0_30px_rgba(255,255,255,0.25)]">
+                    <span>Start Monitoring</span>
+                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom Telemetry Ticker Strip -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-t border-neutral-800 pt-4 font-mono text-[11px] uppercase tracking-widest text-neutral-500">
+            <span>01 INTRO → 02 USER INPUT → 03 OUTCOME → 04 LIFE UPGRADES</span>
+            <span class="text-white">AURA OS READY</span>
+        </div>
+    </div>
+
+    <!-- Twinkling Starfield Canvas Background -->
+    <canvas id="starfieldCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-30 bg-black/80 backdrop-blur-md border-b border-neutral-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.25)]">
+                    <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="font-extrabold text-lg tracking-tight text-white">AURA <span class="text-neutral-400 font-light">OS</span></span>
+                    <span class="hidden sm:inline-block ml-2 text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-white/5 text-neutral-300 border border-neutral-700">NOIR TELEMETRY</span>
+                </div>
+            </div>
+
+            <!-- Live Streak & Hackathon Demo Preset Buttons -->
+            <div class="flex items-center gap-2">
+                <button onclick="replayIntro()" title="Replay Intro Screen" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-mono rounded-lg bg-black text-neutral-400 border border-neutral-800 hover:border-white hover:text-white transition">
+                    <span>▶ Intro</span>
+                </button>
+                <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-950 border border-neutral-800 mr-2">
+                    <span class="text-xs text-white">✦</span>
+                    <span class="text-xs font-mono font-semibold text-neutral-200" id="streakBadge">3-Day Focus Streak</span>
+                </div>
+                <span class="hidden md:inline text-xs text-neutral-500 mr-1">Profiles:</span>
+                <button onclick="loadPreset('distracted')" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-neutral-950 text-neutral-400 border border-neutral-800 hover:border-white hover:text-white transition">
+                    Burnout Student
+                </button>
+                <button onclick="loadPreset('average')" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-neutral-950 text-neutral-300 border border-neutral-800 hover:border-white hover:text-white transition">
+                    Average Day
+                </button>
+                <button onclick="loadPreset('lockedIn')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white text-black border border-white hover:bg-neutral-200 transition">
+                    Peak Focus
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- STAGE FLOW BAR: 01 Intro -> 02 Input -> 03 Outcome -> 04 Life Upgrades -->
+    <div id="stageNavBar" class="relative z-20 bg-neutral-950/90 border-b border-neutral-800/90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto">
+                <button type="button" onclick="replayIntro()" class="px-3 py-1.5 rounded-lg text-xs font-mono border border-neutral-800 bg-black text-neutral-400 hover:text-white hover:border-neutral-600 transition shrink-0">
+                    01 / INTRO
+                </button>
+                <span class="text-neutral-700 font-mono text-xs">→</span>
+                <button type="button" id="stageTab-input" onclick="switchStage('input')" class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold border border-white bg-white text-black transition shrink-0">
+                    02 / USER INPUT
+                </button>
+                <span class="text-neutral-700 font-mono text-xs">→</span>
+                <button type="button" id="stageTab-outcome" onclick="switchStage('outcome')" class="px-3 py-1.5 rounded-lg text-xs font-mono border border-neutral-800 bg-black text-neutral-400 hover:text-white hover:border-neutral-600 transition shrink-0">
+                    03 / OUTCOME
+                </button>
+                <span class="text-neutral-700 font-mono text-xs">→</span>
+                <button type="button" id="stageTab-upgrades" onclick="switchStage('upgrades')" class="px-3 py-1.5 rounded-lg text-xs font-mono border border-neutral-800 bg-black text-neutral-400 hover:text-white hover:border-neutral-600 transition shrink-0">
+                    04 / LIFE UPGRADES
+                </button>
+            </div>
+            <div id="stageSubtitle" class="hidden md:block text-xs font-mono text-neutral-400">
+                STEP 02: Log daily habits, distractions &amp; focus goal
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Banner (Replaces alert()) -->
+    <div id="toastBanner" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-neutral-950 border border-neutral-700 text-white px-4 py-3 rounded-xl shadow-[0_0_25px_rgba(255,255,255,0.12)] flex items-center gap-3">
+            <span id="toastIcon" class="w-2 h-2 rounded-full bg-white"></span>
+            <p id="toastMessage" class="text-sm font-medium">Profile loaded</p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- STAGE 02: USER INPUT INTERFACE -->
+        <section id="stage-input" class="max-w-4xl mx-auto">
+            <div class="bg-neutral-950/85 backdrop-blur-md border border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-800 pb-5 mb-6">
+                    <div>
+                        <span class="font-mono text-[11px] uppercase tracking-widest text-neutral-400">STAGE 02 // TELEMETRY CAPTURE</span>
+                        <h2 class="text-2xl font-extrabold text-white tracking-tight mt-0.5">Input Your Daily Life Data</h2>
+                        <p class="text-xs sm:text-sm text-neutral-400 mt-1">Set your hours, record live events, and define what you need to stay focused on.</p>
+                    </div>
+                    <span class="text-xs font-mono text-neutral-300 bg-black border border-neutral-800 px-3 py-1.5 rounded-lg self-start">24h Input Matrix</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Pillar 1: Deep Work / Study -->
+                    <div class="bg-black/75 p-4 rounded-xl border border-neutral-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="deepWorkInput" class="text-sm font-semibold text-white flex items-center gap-2">
+                                <span>◎ Deep Work &amp; Study</span>
+                            </label>
+                            <span id="deepWorkVal" class="font-mono text-xs font-bold text-black bg-white px-2.5 py-0.5 rounded">4.0 hrs</span>
+                        </div>
+                        <input type="range" id="deepWorkInput" min="0" max="12" step="0.5" value="4.0" class="w-full">
+                        <div class="flex justify-between text-[11px] text-neutral-500 mt-1">
+                            <span>0h</span>
+                            <span>Target: 5–6h</span>
+                            <span>12h</span>
+                        </div>
+                    </div>
+
+                    <!-- Pillar 2: Digital Distractions -->
+                    <div class="bg-black/75 p-4 rounded-xl border border-neutral-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <label for="distractionInput" class="text-sm font-semibold text-neutral-200 flex items-center gap-2">
+                                <span>⊘ Social Media &amp; Scrolling</span>
+                            </label>
+                            <span id="distractionVal" class="font-mono text-xs font-bold text-white bg-neutral-900 border border-neutral-700 px-2.5 py-0.5 rounded">3.5 hrs</span>
+                  
